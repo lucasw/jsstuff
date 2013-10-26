@@ -4,8 +4,27 @@ var map = new Array();
 for (var i = 0; i < 16; i++) {
   map[i] = new Array();
   for (var j = 0; j < 16; j++) {
-    map[i][j] = Math.random() > 0.8;
+    map[i][j] = (i%2 === 0);//  Math.random() > 0.8;
   }
+}
+
+var drawTrapezoid = function(
+    i, j, 
+    x, y, 
+    width, height, 
+    trap_height, depth, 
+    color, the_canvas) {
+  // draw inner part
+  var new_id = 'pix_trap_' + i + '_' + j;
+  var new_div = '<div class="trapezoid_vert" id=' + new_id + '></div>';
+  the_canvas.append(new_div);
+  $('#' + new_id).css('border-right', width + 'px solid ' + color);
+  $('#' + new_id).css('border-top', trap_height + 'px solid transparent');
+  $('#' + new_id).css('border-bottom', trap_height + 'px solid transparent');
+  $('#' + new_id).css('left', x + 'px');
+  $('#' + new_id).css('top',  y + 'px');
+  $('#' + new_id).css('height',  height - trap_height*2 + 'px');
+  $('#' + new_id).css('z-index', depth);
 }
 
 var drawScreen = function(x_pos, y_pos, the_canvas) {
@@ -30,9 +49,10 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
             + (255 - j * 8)  + ',' + 
             + ((i + j) * 4) + 
         ')';
+        
+        $('#' + new_id).css('background-color', color);
 
-        $('#' + new_id).css('background-color', color); 
-       
+        //$('#' + new_id).css('color', color); 
 
         // 3d view
         var x_dist = i - x_pos;
@@ -47,18 +67,50 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
           $('#' + new_id).css('height', sz + 'px');
           $('#' + new_id).css('width',  sz + 'px');
           $('#' + new_id).css('background-color', color); 
-          $('#' + new_id).css('z-index', -y_dist);
+          $('#' + new_id).css('z-index', -y_dist*2);
 
           var x_center = (x_dist * sz) - sz/2 + sz_3d/2;
+          var y_center = x_offset_3d + sz_3d/2 - sz/2;
           if (true) {
             // (x_center + sz/2 > x_offset_3d) && 
             // (x_center - sz/2 < x_offset_3d + sz_3d)) {
             $('#' + new_id).css('left', 
                 (x_center) + 'px');
             $('#' + new_id).css('top',  
-                (x_offset_3d + sz_3d/2 - sz/2) + 'px');
+                (y_center) + 'px');
           }
 
+          // draw perspective walls
+          var color_trap = 'rgb(' 
+            + (255 - i * 16 - 50) + ',' + 
+            + (255 - j * 8 - 50)  + ',' + 
+            + ((i + j) * 4) + 
+          ')';
+
+
+          if (x_dist > 0) {
+            var sz2 = sz_3d / Math.pow(2, y_dist + 1);
+            var x_center2 = (x_dist * sz2) - sz2/2 + sz_3d/2;
+            var y_center2 = x_offset_3d + sz_3d/2 - sz2/2;
+
+            var trap_width = x_center - x_center2;
+/*
+var drawTrapezoid = function(
+    i, j, 
+    x, y, 
+    width, height, 
+    trap_height, depth, 
+    color, the_canvas) {
+ */
+            drawTrapezoid(
+                i, j, 
+                x_center - trap_width, y_center, 
+                trap_width, 
+                sz,
+                sz/4,
+                -y_dist*2 - 0, 
+                color_trap, the_canvas);
+          }
         } // 3d view
 
       } // is wall
@@ -70,12 +122,12 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   var i = x_pos;
   var j = y_pos;
   var new_id = 'map' + i + '_' + j;
-        var new_div = '<div class="block" id=' + new_id + '></div>';
-        the_canvas.append(new_div);
-        $('#' + new_id).css('left', (i * 20) + 'px');
-        $('#' + new_id).css('top',  (j * 20) + 'px');
-        $('#' + new_id).css('background-color', "#001100"); 
- 
+  var new_div = '<div class="block" id=' + new_id + '></div>';
+  the_canvas.append(new_div);
+  $('#' + new_id).css('left', (i * 20) + 'px');
+  $('#' + new_id).css('top',  (j * 20) + 'px');
+  $('#' + new_id).css('background-color', "#001100"); 
+
 
   // draw trapezoid
   if (false) {
