@@ -58,19 +58,20 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
         var x_dist = i - x_pos;
         var y_dist = y_pos - j;
 
-        if ((y_dist > 0) && (y_dist < 10)) {
+        if ((y_dist >= 0) && (y_dist < 9)) {
+        var sz = sz_3d / Math.pow(2, y_dist);
+        var x_center = (x_dist * sz) - sz/2 + sz_3d/2;
+        var y_center = x_offset_3d + sz_3d/2 - sz/2;
+        if ((y_dist > 0)) {
           var new_id = 'map_3d_' + i + '_' + j;
           var new_div = '<div class="block" id=' + new_id + '></div>';
           the_canvas.append(new_div);
 
-          var sz = sz_3d / Math.pow(2, y_dist);
           $('#' + new_id).css('height', sz + 'px');
           $('#' + new_id).css('width',  sz + 'px');
           $('#' + new_id).css('background-color', color); 
           $('#' + new_id).css('z-index', -y_dist*2);
 
-          var x_center = (x_dist * sz) - sz/2 + sz_3d/2;
-          var y_center = x_offset_3d + sz_3d/2 - sz/2;
           if (true) {
             // (x_center + sz/2 > x_offset_3d) && 
             // (x_center - sz/2 < x_offset_3d + sz_3d)) {
@@ -87,6 +88,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
             + ((i + j) * 4) + 
           ')';
 
+        
 
           if (x_dist > 0) {
             var sz2 = sz_3d / Math.pow(2, y_dist + 1);
