@@ -47,7 +47,7 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   $('#' + new_id).css('height', sz + 'px');
   $('#' + new_id).css('width',  sz + 'px');
   $('#' + new_id).css('background-color', color); 
-  $('#' + new_id).css('z-index', -y_dist*2);
+  $('#' + new_id).css('z-index', -Math.round(y_dist * map.length));
 
   if (true) {
     // (x_center + sz/2 > x_offset_3d) && 
@@ -70,7 +70,7 @@ var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
     ')';
 
   // draw right hand walls
-  if ((x_dist > 0) && ((i === 0) || !(map[i-1][j]))) {
+  if ((x_dist > 0.5) && ((i === 0) || !(map[i-1][j]))) {
     var sz2 = sz_3d / Math.pow(2, y_dist + 1);
     var x_center2 = (x_dist * sz2) - sz2/2 + sz_3d/2;
     var y_center2 = x_offset_3d + sz_3d/2 - sz2/2;
@@ -82,7 +82,7 @@ var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
       x_center - trap_width, y_center, // ul xy  
       trap_width, sz, // width, height
       sz/4,   // trap_height
-      -y_dist*2 - 1, // z-index
+      - Math.round(y_dist * map.length + x_dist), // z-index
       color_trap, the_canvas);
   } // x_dist is > 0
 }
@@ -154,21 +154,21 @@ $(document).ready( function() {
   $(document).keydown( function(key) {
     switch(parseInt(key.which,10)) {
       case 65:
-        x_pos -= 1;
-        drawScreen(x_pos, y_pos, the_canvas);
-        break;
-      case 83:
-        y_pos += 1;
-        drawScreen(x_pos, y_pos, the_canvas);
-        break;
-      case 87:
-        y_pos -= 1;
+        x_pos -= 0.1;
         drawScreen(x_pos, y_pos, the_canvas);
         break;
       case 68:
-        x_pos += 1;
+        x_pos += 0.1;
         drawScreen(x_pos, y_pos, the_canvas);
         break;  
+      case 83:
+        y_pos += 0.1;
+        drawScreen(x_pos, y_pos, the_canvas);
+        break;
+      case 87:
+        y_pos -= 0.1;
+        drawScreen(x_pos, y_pos, the_canvas);
+        break;
       default:
         break;
   
