@@ -10,7 +10,8 @@ for (var i = 0; i < 16; i++) {
 }
 
 var drawTrapezoid = function(
-    i, j, 
+    i, j,
+    draw_right,
     x, y, 
     width, height, 
     trap_height, depth, 
@@ -19,7 +20,13 @@ var drawTrapezoid = function(
   var new_id = 'pix_trap_' + i + '_' + j;
   var new_div = '<div class="trapezoid_vert" id=' + new_id + '></div>';
   the_canvas.append(new_div);
+  if (draw_right) {
+  $('#' + new_id).css('border-left', 0 + 'px solid ' + color);
   $('#' + new_id).css('border-right', width + 'px solid ' + color);
+  } else {
+  $('#' + new_id).css('border-left', width + 'px solid ' + color);
+  $('#' + new_id).css('border-right', 0 + 'px solid ' + color);
+  }
   $('#' + new_id).css('border-top', trap_height + 'px solid transparent');
   $('#' + new_id).css('border-bottom', trap_height + 'px solid transparent');
   $('#' + new_id).css('left', x + 'px');
@@ -70,26 +77,44 @@ var drawPerspectiveWall = function(the_canvas, i, j,
     + ((i + j) * 4) + 
     ')';
 
+  var draw_right = ((x_dist > 0.5) && ((i === 0) || !(map[i-1][j])));
+  var draw_left = ((x_dist < -0.5) && ((i === map.length-1) || !(map[i+1][j])));
   // draw right hand walls
-  if ((x_dist > 0.5)){ // && ((i === 0) || !(map[i-1][j]))) {
+  if (draw_right || draw_left) {
     var sz2 = sz_3d / Math.pow(2, y_dist + 1);
-    var x_center2 = (x_dist * sz2) - sz2/2 + x_3d_view_center;
     var y_center2 = x_offset_3d + sz_3d/2 - sz2/2;
-
-    var trap_width = x_center - x_center2;
     
-    var x = x_center - trap_width;
-    if (x < x_max) {
-    drawTrapezoid(
-      i, j, 
-      x, y_center, // ul xy  
-      trap_width + 1.0, sz, // width + fudge, height
-      sz/4,   // trap_height
-      - Math.round(y_dist * map.length + x_dist), // z-index
-      color_trap, the_canvas);
-    }
-  } // x_dist is > 0
-}
+    if (draw_right) {
+      var x_center2 = (x_dist * sz2) - sz2/2 + x_3d_view_center;
+      var trap_width = Math.abs(x_center - x_center2);
+      var x = x_center - trap_width;
+      if ((x + trap_width > 0) && (x < x_max)) {
+        drawTrapezoid(
+            i, j,
+            draw_right,
+            x, y_center, // ul xy  
+            trap_width + 1.0, sz, // width + fudge, height
+            sz/4,   // trap_height
+            - Math.round(y_dist * map.length + Math.abs(x_dist)), // z-index
+            color_trap, the_canvas);
+      } 
+    } else { // draw left
+      var x_center2 = ((x_dist - 1) * sz2) - sz2/2 + x_3d_view_center;
+      var trap_width = Math.abs(x_center - x_center2);
+      var x = x_center + sz;
+      if ((x + trap_width > 0) && (x < x_max)) {
+        drawTrapezoid(
+            i, j,
+            draw_right,
+            x, y_center, // ul xy  
+            trap_width + 1.0, sz, // width + fudge, height
+            sz/4,   // trap_height
+            - Math.round(y_dist * map.length + Math.abs(x_dist)), // z-index
+            color_trap, the_canvas);
+      }
+    } // draw left or right
+  } // draw trapezoids
+} // walls
 
 var drawScreen = function(x_pos, y_pos, the_canvas) {
   $(".top").empty();
@@ -119,7 +144,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
         var x_dist = i - x_pos;
         var y_dist = y_pos - j;
 
-        if ((y_dist >= 0) && (y_dist < 9)) {
+        if ((y_dist >= 0) && (y_dist < 8)) {
           var sz = sz_3d / Math.pow(2, y_dist);
           var x_center = (x_dist * sz) - sz/2 + x_3d_view_center;
           var y_center = x_offset_3d + sz_3d/2 - sz/2;
