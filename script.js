@@ -38,7 +38,10 @@ var drawMap = function(the_canvas, i, j, color) {
 }
 
 var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz, 
-    x_center, y_center) {
+    x_center, y_center,
+    x_max) {
+  
+  if (x_center < x_max) {
   var new_id = 'map_3d_' + i + '_' + j;
   var new_div = '<div class="block" id=' + new_id + '></div>';
   the_canvas.append(new_div);
@@ -48,12 +51,9 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   $('#' + new_id).css('background-color', color); 
   $('#' + new_id).css('z-index', -Math.round(y_dist * map.length));
 
-  if (true) {
-    // (x_center + sz/2 > x_offset_3d) && 
-    // (x_center - sz/2 < x_offset_3d + sz_3d)) 
-    $('#' + new_id).css('left', 
+  $('#' + new_id).css('left', 
         (x_center) + 'px');
-    $('#' + new_id).css('top',  
+  $('#' + new_id).css('top',  
         (y_center) + 'px');
   }
 }
@@ -61,7 +61,8 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
 var drawPerspectiveWall = function(the_canvas, i, j, 
     x_dist, y_dist, sz, sz_3d, 
     x_offset_3d, x_3d_view_center,
-    x_center, y_center) {
+    x_center, y_center,
+    x_max) {
   // draw perspective walls
   var color_trap = 'rgb(' 
     + (255 - i * 16 - 50) + ',' + 
@@ -77,23 +78,26 @@ var drawPerspectiveWall = function(the_canvas, i, j,
 
     var trap_width = x_center - x_center2;
     
-    //var x = x_center - trap_width;
-    //if (x < screen.width) {
+    var x = x_center - trap_width;
+    if (x < x_max) {
     drawTrapezoid(
       i, j, 
-      x_center - trap_width, y_center, // ul xy  
+      x, y_center, // ul xy  
       trap_width + 1.0, sz, // width + fudge, height
       sz/4,   // trap_height
       - Math.round(y_dist * map.length + x_dist), // z-index
       color_trap, the_canvas);
-    //}
+    }
   } // x_dist is > 0
 }
 
 var drawScreen = function(x_pos, y_pos, the_canvas) {
   $(".top").empty();
   // draw the xy coordinates to the screen
-  the_canvas.append('<p>' + x_pos + ' ' + y_pos + '</p>');
+  var x_max = $('body').innerWidth();
+  the_canvas.append('<p>' + x_max + ' ' + 
+      screen.width + ' ' + screen.height + ' ' + 
+      x_pos + ' ' + y_pos + '</p>');
   
   var x_offset_3d = map.length * 20;
   var x_3d_view_center = 720;
@@ -122,11 +126,12 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
           if ((y_dist > 0)) {
             // draw the straight on walls
             drawFlatWall(the_canvas, i, j, color, x_dist, y_dist, sz, 
-                x_center, y_center);
+                x_center, y_center, x_max);
             
             drawPerspectiveWall(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
                 x_offset_3d, x_3d_view_center,
-                x_center, y_center);
+                x_center, y_center,
+                x_max);
           } // y_dist
         } // y_dist
 
