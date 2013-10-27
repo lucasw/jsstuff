@@ -34,7 +34,6 @@ var drawMap = function(the_canvas, i, j, color) {
   the_canvas.append(new_div);
   $('#' + new_id).css('left', (i * 20) + 'px');
   $('#' + new_id).css('top',  (j * 20) + 'px');
-
   $('#' + new_id).css('background-color', color);
 }
 
@@ -59,8 +58,9 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   }
 }
 
-var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d, 
-    x_offset_3d,
+var drawPerspectiveWall = function(the_canvas, i, j, 
+    x_dist, y_dist, sz, sz_3d, 
+    x_offset_3d, x_3d_view_center,
     x_center, y_center) {
   // draw perspective walls
   var color_trap = 'rgb(' 
@@ -70,13 +70,15 @@ var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
     ')';
 
   // draw right hand walls
-  if ((x_dist > 0.5) && ((i === 0) || !(map[i-1][j]))) {
+  if ((x_dist > 0.5)){ // && ((i === 0) || !(map[i-1][j]))) {
     var sz2 = sz_3d / Math.pow(2, y_dist + 1);
-    var x_center2 = (x_dist * sz2) - sz2/2 + sz_3d/2;
+    var x_center2 = (x_dist * sz2) - sz2/2 + x_3d_view_center;
     var y_center2 = x_offset_3d + sz_3d/2 - sz2/2;
 
     var trap_width = x_center - x_center2;
-
+    
+    //var x = x_center - trap_width;
+    //if (x < screen.width) {
     drawTrapezoid(
       i, j, 
       x_center - trap_width, y_center, // ul xy  
@@ -84,6 +86,7 @@ var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
       sz/4,   // trap_height
       - Math.round(y_dist * map.length + x_dist), // z-index
       color_trap, the_canvas);
+    //}
   } // x_dist is > 0
 }
 
@@ -93,6 +96,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   the_canvas.append('<p>' + x_pos + ' ' + y_pos + '</p>');
   
   var x_offset_3d = map.length * 20;
+  var x_3d_view_center = 720;
   var sz_3d = 512;
 
   for (var i = 0; i < map.length; i++) {
@@ -113,7 +117,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
 
         if ((y_dist >= 0) && (y_dist < 9)) {
           var sz = sz_3d / Math.pow(2, y_dist);
-          var x_center = (x_dist * sz) - sz/2 + sz_3d/2;
+          var x_center = (x_dist * sz) - sz/2 + x_3d_view_center;
           var y_center = x_offset_3d + sz_3d/2 - sz/2;
           if ((y_dist > 0)) {
             // draw the straight on walls
@@ -121,7 +125,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
                 x_center, y_center);
             
             drawPerspectiveWall(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
-                x_offset_3d,
+                x_offset_3d, x_3d_view_center,
                 x_center, y_center);
           } // y_dist
         } // y_dist
@@ -134,12 +138,16 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   // TBD make this into drawBlock function
   var i = x_pos;
   var j = y_pos;
-  var new_id = 'map' + i + '_' + j;
+  var x = i * 20;
+  var y = j * 20;
+  if (x < screen.width) {
+  var new_id = 'map_player' + Math.round(i) + '_' + Math.round(j);
   var new_div = '<div class="block" id=' + new_id + '></div>';
   the_canvas.append(new_div);
-  $('#' + new_id).css('left', (i * 20) + 'px');
-  $('#' + new_id).css('top',  (j * 20) + 'px');
+  $('#' + new_id).css('left', Math.round(x) + 'px');
+  $('#' + new_id).css('top',  Math.round(y) + 'px');
   $('#' + new_id).css('background-color', "#001100"); 
+  }
 }
 
 $(document).ready( function() {
