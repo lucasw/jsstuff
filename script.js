@@ -75,7 +75,6 @@ var drawPerspectiveWall = function(the_canvas, i, j,
     x_max) {
   // draw perspective walls
 
-
   var draw_right = ((x_dist > 0.5) && ((i === 0) || !(map[i-1][j])));
   var draw_left = ((x_dist < -0.5) && ((i === map.length-1) || !(map[i+1][j])));
   // draw right hand walls
@@ -191,11 +190,24 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   }
 }
 
+var testMap = function(x, y) {
+  var xi = Math.round(x + 0.5);
+  var yi = Math.round(y + 0.5);
+  var is_on_map = (xi >= 0) && (xi < map.length) && 
+        (yi >= 0) && (yi < map.length);
+
+  if (!is_on_map) return true;
+
+  if (map[xi][yi]) return false;
+
+  return true;
+}
+
 $(document).ready( function() {
   var the_canvas = $("body");
   var x_pos = map.length/2;
   var y_pos = map.length;
-  
+  var move_inc = 0.1;
   // TODO separate init of the screen from updating?
   // should I have to append the new_div every update or not?
   drawScreen(x_pos, y_pos, the_canvas);
@@ -203,20 +215,28 @@ $(document).ready( function() {
   $(document).keydown( function(key) {
     switch(parseInt(key.which,10)) {
       case 65:
-        x_pos -= 0.1;
-        drawScreen(x_pos, y_pos, the_canvas);
+        if (testMap(x_pos - move_inc, y_pos)) {
+          x_pos -= move_inc;
+          drawScreen(x_pos, y_pos, the_canvas);
+        }
         break;
       case 68:
-        x_pos += 0.1;
-        drawScreen(x_pos, y_pos, the_canvas);
+        if (testMap(x_pos + move_inc, y_pos)) {
+          x_pos += move_inc;
+          drawScreen(x_pos, y_pos, the_canvas);
+        }
         break;  
       case 83:
-        y_pos += 0.1;
+        if (testMap(x_pos, y_pos + move_inc)) {
+        y_pos += move_inc;
         drawScreen(x_pos, y_pos, the_canvas);
+        }
         break;
       case 87:
-        y_pos -= 0.1;
-        drawScreen(x_pos, y_pos, the_canvas);
+        if (testMap(x_pos, y_pos - move_inc)) {
+          y_pos -= move_inc;
+          drawScreen(x_pos, y_pos, the_canvas);
+        }
         break;
       default:
         break;
