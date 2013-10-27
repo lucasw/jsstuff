@@ -10,14 +10,14 @@ for (var i = 0; i < map_sz; i++) {
 }
 
 var drawTrapezoid = function(
-    i, j,
+    i, j, id,
     draw_right,
     x, y, 
     width, height, 
     trap_height, depth, 
     color, the_canvas) {
   // draw inner part
-  var new_id = 'pix_trap_' + i + '_' + j;
+  var new_id = 'pix_trap_' + i + '_' + j + '_' + id;
   var new_div = '<div class="trapezoid_vert" id=' + new_id + '></div>';
   the_canvas.append(new_div);
   if (draw_right) {
@@ -35,6 +35,40 @@ var drawTrapezoid = function(
   $('#' + new_id).css('z-index', depth);
 }
 
+var drawTrapezoidOutline = function(
+    i, j,
+    draw_right,
+    x, y, 
+    width, height, 
+    trap_height, depth, 
+    color, color_outline,
+    thickness,
+    the_canvas) {
+
+  if (true) {
+  drawTrapezoid(
+    i, j, 'outline',
+    draw_right,
+    x, y, 
+    width, height, 
+    trap_height, depth, 
+    color_outline,
+    the_canvas);
+  }
+
+  if ((width > thickness * 2) && (height > thickness * 2) &&
+    (trap_height > thickness * 2)) {
+  //if (false) {
+    drawTrapezoid(
+      i, j, 'inner',
+      draw_right,
+      x + thickness, y + thickness, 
+      width - thickness * 1.5, height - thickness * 2, 
+      trap_height - thickness/2, depth, 
+      color,
+      the_canvas);
+  }
+}
 var drawMap = function(the_canvas, i, j, color) {
   var new_id = 'map' + i + '_' + j;
   var new_div = '<div class="block" id=' + new_id + '></div>';
@@ -96,28 +130,34 @@ var drawPerspectiveWall = function(the_canvas, i, j,
       var trap_width = Math.abs(x_center - x_center2);
       var x = x_center - trap_width;
       if ((x + trap_width > 0) && (x < x_max)) {
-        drawTrapezoid(
+        drawTrapezoidOutline(
             i, j,
             draw_right,
             x, y_center, // ul xy  
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
             z_index,
-            color_trap, the_canvas);
+            color_trap, 
+            '#000000',
+            6,
+            the_canvas);
       } 
     } else { // draw left
       var x_center2 = ((x_dist - 1) * sz2) - sz2/2 + x_3d_view_center;
       var trap_width = Math.abs(x_center - x_center2);
       var x = x_center + sz;
       if ((x + trap_width > 0) && (x < x_max)) {
-        drawTrapezoid(
-            i, j,
+        drawTrapezoidOutline(
+            i, j, 
             draw_right,
             x - 2.0, y_center, // ul xy  
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
             z_index,
-            color_trap, the_canvas);
+            color_trap,
+            '#000000',
+            6,
+            the_canvas);
       }
     } // draw left or right
   } // draw trapezoids
