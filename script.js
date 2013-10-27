@@ -56,10 +56,11 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   var new_div = '<div class="block" id=' + new_id + '></div>';
   the_canvas.append(new_div);
 
+  var z_index = -Math.round(y_dist * map.length);
   $('#' + new_id).css('height', sz + 'px');
   $('#' + new_id).css('width',  (sz + 2) + 'px');
   $('#' + new_id).css('background-color', color); 
-  $('#' + new_id).css('z-index', -Math.round(y_dist * map.length));
+  $('#' + new_id).css('z-index', z_index);
 
   $('#' + new_id).css('left', 
         (x_center - 2) + 'px');
@@ -88,6 +89,7 @@ var drawPerspectiveWall = function(the_canvas, i, j,
 
     var sz2 = sz_3d / y_pow;
     var y_center2 = y_offset_3d + sz_3d/2 - sz2/2;
+    var z_index = - Math.round(y_dist * map.length + Math.abs(x_dist)); 
     
     if (draw_right) {
       var x_center2 = (x_dist * sz2) - sz2/2 + x_3d_view_center;
@@ -100,7 +102,7 @@ var drawPerspectiveWall = function(the_canvas, i, j,
             x, y_center, // ul xy  
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
-            - Math.round(y_dist * map.length + Math.abs(x_dist)), // z-index
+            z_index,
             color_trap, the_canvas);
       } 
     } else { // draw left
@@ -114,7 +116,7 @@ var drawPerspectiveWall = function(the_canvas, i, j,
             x - 2.0, y_center, // ul xy  
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
-            - Math.round(y_dist * map.length + Math.abs(x_dist)), // z-index
+            z_index,
             color_trap, the_canvas);
       }
     } // draw left or right
