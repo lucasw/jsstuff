@@ -80,7 +80,7 @@ var drawPerspectiveWall = function(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
     drawTrapezoid(
       i, j, 
       x_center - trap_width, y_center, // ul xy  
-      trap_width, sz, // width, height
+      trap_width + 1.0, sz, // width + fudge, height
       sz/4,   // trap_height
       - Math.round(y_dist * map.length + x_dist), // z-index
       color_trap, the_canvas);
