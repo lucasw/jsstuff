@@ -191,7 +191,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
 }
 
 var testMap = function(x, y) {
-  var xi = Math.round(x + 0.5);
+  var xi = Math.round(x);
   var yi = Math.round(y + 0.5);
   var is_on_map = (xi >= 0) && (xi < map.length) && 
         (yi >= 0) && (yi < map.length);
