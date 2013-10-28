@@ -8,6 +8,10 @@ for (var i = 0; i < map_sz; i++) {
     map[i][j] = Math.random() > 0.8;
   }
 }
+var x_pos = map_sz/2;
+var y_pos = map_sz;
+var last_x_move = 0;
+var last_y_move = 0;
 
 var drawTrapezoid = function(
     i, j, id,
@@ -234,7 +238,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   }
 }
 
-var testMap = function(x, y) {
+var mapIsEmpty = function(x, y) {
   var xi = Math.round(x);
   var yi = Math.round(y + 0.5);
   var is_on_map = (xi >= 0) && (xi < map.length) && 
@@ -247,10 +251,39 @@ var testMap = function(x, y) {
   return true;
 }
 
+var move = function(the_canvas, dx, dy) {
+  var did_move = false;
+  if (dx !== 0) {
+    if (mapIsEmpty(x_pos + dx, y_pos)) {
+      x_pos += dx;
+      last_x_move = dx;
+      did_move = true;
+    } else if (mapIsEmpty(x_pos, y_pos + last_y_move/10.0)) {
+      // slide on wall
+      y_pos += last_y_move/10.0;
+      did_move = true;
+    }
+  }
+  if (dy !== 0) {
+    if (mapIsEmpty(x_pos, y_pos + dy)) {
+      y_pos += dy;
+      last_y_move = dy;
+      did_move = true;
+    } else if (mapIsEmpty(x_pos + last_x_move/10.0, y_pos)) {
+      // slide on wall
+      x_pos += last_x_move/10.0;
+      did_move = true;
+    }
+  }
+  
+  if (did_move) {
+    console.log(x_pos + ' ' + y_pos);
+    drawScreen(x_pos, y_pos, the_canvas);
+  }
+}
+
 $(document).ready( function() {
   var the_canvas = $("body");
-  var x_pos = map.length/2;
-  var y_pos = map.length;
   var move_inc = 0.1;
   // TODO separate init of the screen from updating?
   // should I have to append the new_div every update or not?
@@ -259,28 +292,16 @@ $(document).ready( function() {
   $(document).keydown( function(key) {
     switch(parseInt(key.which,10)) {
       case 65:
-        if (testMap(x_pos - move_inc, y_pos)) {
-          x_pos -= move_inc;
-          drawScreen(x_pos, y_pos, the_canvas);
-        }
+        move(the_canvas,  -move_inc, 0);
         break;
       case 68:
-        if (testMap(x_pos + move_inc, y_pos)) {
-          x_pos += move_inc;
-          drawScreen(x_pos, y_pos, the_canvas);
-        }
+        move(the_canvas, move_inc, 0);
         break;  
       case 83:
-        if (testMap(x_pos, y_pos + move_inc)) {
-        y_pos += move_inc;
-        drawScreen(x_pos, y_pos, the_canvas);
-        }
+        move(the_canvas, 0,  move_inc);
         break;
       case 87:
-        if (testMap(x_pos, y_pos - move_inc)) {
-          y_pos -= move_inc;
-          drawScreen(x_pos, y_pos, the_canvas);
-        }
+        move(the_canvas, 0, -move_inc);
         break;
       default:
         break;
