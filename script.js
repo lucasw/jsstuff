@@ -198,7 +198,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
         var y_dist = y_pos - j;
 
         if ((Math.abs(x_dist) < 28) && 
-            (y_dist >= -1) && (y_dist < 6)) {
+            (y_dist >= -1) && (y_dist < 7)) {
           var sz = sz_3d / Math.pow(2, y_dist);
           var x_center = (x_dist * sz) - sz/2 + x_3d_view_center;
           var y_center = y_offset_3d + sz_3d/2 - sz/2;
@@ -221,8 +221,8 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
     // TBD make this into drawBlock function
     var i = x_pos;
     var j = y_pos;
-    var x = i * 20;
-    var y = j * 20;
+    var x = (i + 0.5) * 20;
+    var y = (j + 0.5) * 20;
     if (x < screen.width) {
       var new_id = 'map_player' + Math.round(i) + '_' + Math.round(j);
       var new_div = '<div class="block" id=' + new_id + '></div>';
