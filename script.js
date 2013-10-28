@@ -288,7 +288,11 @@ $(document).ready( function() {
   // TODO separate init of the screen from updating?
   // should I have to append the new_div every update or not?
   drawScreen(x_pos, y_pos, the_canvas);
-  
+ 
+  $('body').click(function() {
+    move(the_canvas, 0, -move_inc);
+  });
+
   $(document).keydown( function(key) {
     switch(parseInt(key.which,10)) {
       case 65:
