@@ -2,8 +2,8 @@
   position:absolute;
   left:0px;
   top:0px;
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
   border-radius:0px;
   background-color: #554466;
   display: inline-block;
@@ -11,6 +11,7 @@
   border-style: solid;
   border-width: 3px;
   border-color: #000000;
+  z-index: 40;
 }
 
 .row {

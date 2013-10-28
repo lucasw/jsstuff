@@ -1,10 +1,10 @@
 // create a random map
 var map = new Array();
-var map_sz = 32;
+var map_sz = 16;
 for (var i = 0; i < map_sz; i++) {
   map[i] = new Array();
   for (var j = 0; j < map_sz; j++) {
-    //map[i][j] = (i%2 === 0);
+    //map[i][j] = (i % 2 === 0);
     map[i][j] = Math.random() > 0.8;
   }
 }
@@ -115,6 +115,9 @@ var drawPerspectiveWall = function(the_canvas, i, j,
   // draw right hand walls
   if (draw_right || draw_left) {
     var y_pow = Math.pow(2, y_dist + 1);
+    if (y_dist < 0) {
+      console.log(" " + y_dist + " " + y_pow);
+    }
     var color_trap = 'rgb(' 
       + ((255 - i * 16 - 50) ) + ',' + 
       + (255 - j * 8 - 50)  + ',' + 
@@ -188,26 +191,25 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
         ')';
 
         // 2d map view
-        //drawMap(the_canvas, i, j, color);
+        drawMap(the_canvas, i, j, color);
 
         // 3d view
         var x_dist = i - x_pos;
         var y_dist = y_pos - j;
 
-        if ((Math.abs(x_dist) < 28) && (y_dist >= 0) && (y_dist < 7)) {
+        if ((Math.abs(x_dist) < 28) && 
+            (y_dist >= -1) && (y_dist < 6)) {
           var sz = sz_3d / Math.pow(2, y_dist);
           var x_center = (x_dist * sz) - sz/2 + x_3d_view_center;
           var y_center = y_offset_3d + sz_3d/2 - sz/2;
-          if ((y_dist > 0)) {
-            // draw the straight on walls
-            drawFlatWall(the_canvas, i, j, color, x_dist, y_dist, sz, 
+          // draw the straight on walls
+          drawFlatWall(the_canvas, i, j, color, x_dist, y_dist, sz, 
                 x_center, y_center, x_max);
             
-            drawPerspectiveWall(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
+          drawPerspectiveWall(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
                 y_offset_3d, x_3d_view_center,
                 x_center, y_center,
                 x_max);
-          } // y_dist
         } // y_dist
 
       } // is wall
@@ -215,7 +217,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
   } // map for loop x
 
   // draw the player position
-  if (false) {
+  if (true) {
     // TBD make this into drawBlock function
     var i = x_pos;
     var j = y_pos;
