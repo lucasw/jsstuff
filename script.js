@@ -57,7 +57,7 @@ var drawTrapezoidOutline = function(
   }
 
   if ((width > thickness * 2) && (height > thickness * 2) &&
-    (trap_height > thickness * 2)) {
+    (trap_height > thickness)) {
   //if (false) {
     drawTrapezoid(
       i, j, 'inner',
@@ -91,15 +91,15 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   the_canvas.append(new_div);
 
   var z_index = -Math.round(y_dist * map.length);
-  $('#' + new_id).css('height', sz + 'px');
-  $('#' + new_id).css('width',  (sz + 2) + 'px');
+  $('#' + new_id).css('height', (sz-6) + 'px');
+  $('#' + new_id).css('width',  (sz-2) + 'px');
   $('#' + new_id).css('background-color', color); 
   $('#' + new_id).css('z-index', z_index);
 
   $('#' + new_id).css('left', 
         (x_center - 2) + 'px');
   $('#' + new_id).css('top',  
-        (y_center) + 'px');
+        (y_center ) + 'px');
   }
 }
 

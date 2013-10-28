@@ -8,6 +8,9 @@
   background-color: #554466;
   display: inline-block;
   border: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #000000;
 }
 
 .row {
