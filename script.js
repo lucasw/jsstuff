@@ -9,7 +9,7 @@ for (var i = 0; i < map_sz; i++) {
   }
 }
 var x_pos = map_sz/2;
-var y_pos = map_sz;
+var y_pos = map_sz * 3;
 var last_x_move = 0;
 var last_y_move = 0;
 var player_sz = 0.5;
@@ -75,8 +75,9 @@ var drawTrapezoidOutline = function(
       the_canvas);
   }
 }
+
 var drawMap = function(the_canvas, i, j, color) {
-  var new_id = 'map' + i + '_' + j;
+  var new_id = 'map' + Math.round(i) + '_' + Math.round(j);
   var new_div = '<div class="block" id=' + new_id + '></div>';
   the_canvas.append(new_div);
   $('#' + new_id).css('left', (i * 20) + 'px');
@@ -204,7 +205,7 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
         ')';
 
         // 2d map view
-        drawMap(the_canvas, i, j, color);
+        drawMap(the_canvas, 10 + x_dist, 10 - y_dist, color);
 
         if ((Math.abs(x_dist) < 28) && 
             (y_dist >= -1) && (y_dist < 7)) {
@@ -233,8 +234,8 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
     // TBD make this into drawBlock function
     var i = x_pos;
     var j = y_pos;
-    var x = (i) * 20;
-    var y = (j) * 20;
+    var x = (10) * 20;
+    var y = (10) * 20;
     if (x < screen.width) {
       var new_id = 'map_player' + Math.round(i) + '_' + Math.round(j);
       var new_div = '<div class="block" id=' + new_id + '></div>';
@@ -251,7 +252,7 @@ var mapIsEmptyPoint = function(x, y) {
   var xi = Math.round(x);
   var yi = Math.round(y);
   var is_on_map = (xi >= 0) && (xi < map.length) && 
-        (yi >= 0) && (yi < map.length);
+        (yi >= 0) && (yi < map[xi].length);
 
   if (!is_on_map) return true;
 
