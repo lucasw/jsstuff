@@ -3,7 +3,7 @@ var map = new Array();
 var map_sz = 16;
 for (var i = 0; i < map_sz; i++) {
   map[i] = new Array();
-  for (var j = 0; j < map_sz; j++) {
+  for (var j = 0; j < map_sz*3; j++) {
     //map[i][j] = (i % 2 === 0);
     map[i][j] = Math.random() > 0.8;
   }
@@ -125,8 +125,8 @@ var drawPerspectiveWall = function(the_canvas, i, j, color,
       //console.log(" " + y_dist + " " + y_pow);
     //}
     var sz2 = sz_3d / y_pow;
-    var x_off = - sz/2;
-    var y_off = - sz/2;
+    var x_off = - sz2/2;
+    var y_off = - sz2/2;
     var y_center2 = y_offset_3d + sz_3d/2 + y_off;
     var z_index = - Math.round(y_dist * map.length + Math.abs(x_dist)); 
     
@@ -148,7 +148,7 @@ var drawPerspectiveWall = function(the_canvas, i, j, color,
             the_canvas);
       } 
     } else { // draw left
-      var x_center2 = ((x_dist - 1) * sz2) - sz2/2 + x_3d_view_center;
+      var x_center2 = ((x_dist - 1) * sz2) + x_3d_view_center + x_off;
       var trap_width = Math.abs(x_center - x_center2);
       var x = x_center + sz;
       if ((x + trap_width > 0) && (x < x_max)) {
@@ -216,7 +216,8 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
           // draw the straight on walls
           drawFlatWall(the_canvas, i, j, color, x_dist, y_dist, sz, 
                 x_center, y_center, x_max);
-            
+          
+          
           drawPerspectiveWall(the_canvas, i, j, color, x_dist, y_dist, sz, sz_3d,
                 y_offset_3d, x_3d_view_center,
                 x_center, y_center,
@@ -232,8 +233,8 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
     // TBD make this into drawBlock function
     var i = x_pos;
     var j = y_pos;
-    var x = (i + 0.5) * 20;
-    var y = (j + 0.5) * 20;
+    var x = (i) * 20;
+    var y = (j) * 20;
     if (x < screen.width) {
       var new_id = 'map_player' + Math.round(i) + '_' + Math.round(j);
       var new_div = '<div class="block" id=' + new_id + '></div>';
@@ -261,20 +262,21 @@ var mapIsEmptyPoint = function(x, y) {
 
 var mapIsEmpty = function(x, y, sz) {
   
-  var off = 0.5;
+  var off = 0.0;
   return (
   // mapIsEmptyPoint(x + off, y + off)
-  //  &&
+  //  &&  
+    /*
     mapIsEmptyPoint(x - sz/2 + off, y + off) &&
     mapIsEmptyPoint(x + sz/2 + off, y + off) 
     && 
     mapIsEmptyPoint(x + off, y - sz/2 + off) &&
     mapIsEmptyPoint(x + off, y + sz/2 + off)
-    /*
-    mapIsEmpty(x - sz/2, y - sz/2) &&
-    mapIsEmpty(x - sz/2, y + sz/2) &&
-    mapIsEmpty(x + sz/2, y + sz/2) &&
-    mapIsEmpty(x + sz/2, y - sz/2));*/
+    */
+    mapIsEmptyPoint(x - sz/2, y - sz/2) &&
+    mapIsEmptyPoint(x - sz/2, y + sz/2) &&
+    mapIsEmptyPoint(x + sz/2, y + sz/2) &&
+    mapIsEmptyPoint(x + sz/2, y - sz/2)
     );
 }
 var move = function(the_canvas, dx, dy) {
