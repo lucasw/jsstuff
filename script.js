@@ -12,6 +12,8 @@ var x_pos = map_sz/2;
 var y_pos = map_sz;
 var last_x_move = 0;
 var last_y_move = 0;
+var player_sz = 0.5;
+
 
 var drawTrapezoid = function(
     i, j, id,
@@ -107,7 +109,7 @@ var drawFlatWall = function(the_canvas, i, j, color, x_dist, y_dist, sz,
   }
 }
 
-var drawPerspectiveWall = function(the_canvas, i, j, 
+var drawPerspectiveWall = function(the_canvas, i, j, color,
     x_dist, y_dist, sz, sz_3d, 
     y_offset_3d, x_3d_view_center,
     x_center, y_center,
@@ -119,21 +121,17 @@ var drawPerspectiveWall = function(the_canvas, i, j,
   // draw right hand walls
   if (draw_right || draw_left) {
     var y_pow = Math.pow(2, y_dist + 1);
-    if (y_dist < 0) {
-      console.log(" " + y_dist + " " + y_pow);
-    }
-    var color_trap = 'rgb(' 
-      + ((255 - i * 16 - 50) ) + ',' + 
-      + (255 - j * 8 - 50)  + ',' + 
-      + ((i + j) * 4 ) + 
-      ')';
-
+    //if (y_dist < 0) {
+      //console.log(" " + y_dist + " " + y_pow);
+    //}
     var sz2 = sz_3d / y_pow;
-    var y_center2 = y_offset_3d + sz_3d/2 - sz2/2;
+    var x_off = - sz/2;
+    var y_off = - sz/2;
+    var y_center2 = y_offset_3d + sz_3d/2 + y_off;
     var z_index = - Math.round(y_dist * map.length + Math.abs(x_dist)); 
     
     if (draw_right) {
-      var x_center2 = (x_dist * sz2) - sz2/2 + x_3d_view_center;
+      var x_center2 = (x_dist * sz2) + x_3d_view_center + x_off;
       var trap_width = Math.abs(x_center - x_center2);
       var x = x_center - trap_width;
       if ((x + trap_width > 0) && (x < x_max)) {
@@ -144,7 +142,7 @@ var drawPerspectiveWall = function(the_canvas, i, j,
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
             z_index,
-            color_trap, 
+            color, 
             '#000000',
             6,
             the_canvas);
@@ -161,7 +159,7 @@ var drawPerspectiveWall = function(the_canvas, i, j,
             trap_width + 1.0, sz, // width + fudge, height
             sz/4,   // trap_height
             z_index,
-            color_trap,
+            color,
             '#000000',
             6,
             the_canvas);
@@ -172,8 +170,9 @@ var drawPerspectiveWall = function(the_canvas, i, j,
 
 var drawScreen = function(x_pos, y_pos, the_canvas) {
   $(".top").empty();
+  the_canvas.css('background-color', '#000000');
   // draw the xy coordinates to the screen
-  var x_max = $('body').innerWidth();
+  var x_max = the_canvas.innerWidth();
   var y_max = $(window).height(); //$('body').innerHeight();
   if (false) {
   the_canvas.append('<p>' + x_max + ' ' + y_max + ' ' + 
@@ -181,36 +180,44 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
       x_pos + ' ' + y_pos + '</p>');
   }
 
-  var x_3d_view_center = 720;
+  var x_3d_view_center = x_max/2;
   var sz_3d = Math.min(x_max, y_max);
   var y_offset_3d = y_max/2 - sz_3d/2; // map.length * 20;
+
 
   for (var i = 0; i < map.length; i++) {
     for (var j = 0; j < map[i].length; j++) {
       if (map[i][j]) {
-        var color = 'rgb(' 
-            + (255 - i * 12) + ',' + 
-            + (255 - j * 6)  + ',' + 
-            + ((i + j) * 4) + 
-        ')';
-
-        // 2d map view
-        drawMap(the_canvas, i, j, color);
 
         // 3d view
         var x_dist = i - x_pos;
         var y_dist = y_pos - j;
 
+        dist = y_dist * y_dist + x_dist * x_dist;
+        if (dist > 36) continue;
+        dist_sc = 1.0 - dist / 36.0;
+
+        var color = 'rgb(' 
+            + Math.round((255 - i * 12) * dist_sc) + ',' + 
+            + Math.round((255 - j * 6) * dist_sc) + ',' + 
+            + Math.round(((i + j) * 4) * dist_sc) + 
+        ')';
+
+        // 2d map view
+        drawMap(the_canvas, i, j, color);
+
         if ((Math.abs(x_dist) < 28) && 
             (y_dist >= -1) && (y_dist < 7)) {
           var sz = sz_3d / Math.pow(2, y_dist);
-          var x_center = (x_dist * sz) - sz/2 + x_3d_view_center;
-          var y_center = y_offset_3d + sz_3d/2 - sz/2;
+          var x_off = -sz/2;
+          var y_off = -sz/2;
+          var x_center = (x_dist * sz) + x_3d_view_center + x_off;
+          var y_center = y_offset_3d + sz_3d/2 + y_off;
           // draw the straight on walls
           drawFlatWall(the_canvas, i, j, color, x_dist, y_dist, sz, 
                 x_center, y_center, x_max);
             
-          drawPerspectiveWall(the_canvas, i, j, x_dist, y_dist, sz, sz_3d,
+          drawPerspectiveWall(the_canvas, i, j, color, x_dist, y_dist, sz, sz_3d,
                 y_offset_3d, x_3d_view_center,
                 x_center, y_center,
                 x_max);
@@ -233,14 +240,15 @@ var drawScreen = function(x_pos, y_pos, the_canvas) {
       the_canvas.append(new_div);
       $('#' + new_id).css('left', Math.round(x) + 'px');
       $('#' + new_id).css('top',  Math.round(y) + 'px');
-      $('#' + new_id).css('background-color', "#001100"); 
+      $('#' + new_id).css('background-color', "#ffff00"); 
     }
   }
 }
 
-var mapIsEmpty = function(x, y) {
+
+var mapIsEmptyPoint = function(x, y) {
   var xi = Math.round(x);
-  var yi = Math.round(y + 0.5);
+  var yi = Math.round(y);
   var is_on_map = (xi >= 0) && (xi < map.length) && 
         (yi >= 0) && (yi < map.length);
 
@@ -251,25 +259,43 @@ var mapIsEmpty = function(x, y) {
   return true;
 }
 
+var mapIsEmpty = function(x, y, sz) {
+  
+  var off = 0.5;
+  return (
+  // mapIsEmptyPoint(x + off, y + off)
+  //  &&
+    mapIsEmptyPoint(x - sz/2 + off, y + off) &&
+    mapIsEmptyPoint(x + sz/2 + off, y + off) 
+    && 
+    mapIsEmptyPoint(x + off, y - sz/2 + off) &&
+    mapIsEmptyPoint(x + off, y + sz/2 + off)
+    /*
+    mapIsEmpty(x - sz/2, y - sz/2) &&
+    mapIsEmpty(x - sz/2, y + sz/2) &&
+    mapIsEmpty(x + sz/2, y + sz/2) &&
+    mapIsEmpty(x + sz/2, y - sz/2));*/
+    );
+}
 var move = function(the_canvas, dx, dy) {
   var did_move = false;
   if (dx !== 0) {
-    if (mapIsEmpty(x_pos + dx, y_pos)) {
+    if (mapIsEmpty(x_pos + dx, y_pos, player_sz)) {
       x_pos += dx;
       last_x_move = dx;
       did_move = true;
-    } else if (mapIsEmpty(x_pos, y_pos + last_y_move/10.0)) {
+    } else if (mapIsEmpty(x_pos, y_pos + last_y_move/10.0, player_sz)) {
       // slide on wall
       y_pos += last_y_move/10.0;
       did_move = true;
     }
   }
   if (dy !== 0) {
-    if (mapIsEmpty(x_pos, y_pos + dy)) {
+    if (mapIsEmpty(x_pos, y_pos + dy, player_sz)) {
       y_pos += dy;
       last_y_move = dy;
       did_move = true;
-    } else if (mapIsEmpty(x_pos + last_x_move/10.0, y_pos)) {
+    } else if (mapIsEmpty(x_pos + last_x_move/10.0, y_pos, player_sz)) {
       // slide on wall
       x_pos += last_x_move/10.0;
       did_move = true;
@@ -277,7 +303,7 @@ var move = function(the_canvas, dx, dy) {
   }
   
   if (did_move) {
-    console.log(x_pos + ' ' + y_pos);
+    //console.log(x_pos + ' ' + y_pos);
     drawScreen(x_pos, y_pos, the_canvas);
   }
 }
@@ -289,7 +315,7 @@ $(document).ready( function() {
   // should I have to append the new_div every update or not?
   drawScreen(x_pos, y_pos, the_canvas);
  
-  $('body').click(function() {
+  the_canvas.click(function() {
     move(the_canvas, 0, -move_inc);
   });
 
